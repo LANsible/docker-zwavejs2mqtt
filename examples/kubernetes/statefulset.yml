@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: zwavejs2mqtt
+  namespace: zwavejs2mqtt
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zwavejs2mqtt
+  namespace: zwavejs2mqtt
+  labels:
+    app: zwavejs2mqtt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zwavejs2mqtt
+  template:
+    metadata:
+      labels:
+        app: zwavejs2mqtt
+    spec:
+      serviceAccountName: zwavejs2mqtt
+      securityContext:
+        fsGroup: 1000  # Only works for configmap, hostPath needs chowning on node
+      containers:
+        - name: zwavejs2mqtt
+          image: lansible/zwavejs2mqtt:master
+          imagePullPolicy: Always
+          securityContext:
+            # Make container filesystem readonly
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: zwavejs2mqtt-config
+              mountPath: /config
+            - name: zwavejs2mqtt-data
+              mountPath: /data
+      volumes:
+        - name: zwavejs2mqtt-config
+          configMap:
+            name: zwavejs2mqtt-config
+        - name: zwavejs2mqtt-data
+          hostPath:
+            path: /data/zwavejs2mqtt-zwavejs2mqtt-data

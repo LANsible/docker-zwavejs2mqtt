@@ -1,0 +1,12 @@
+---
+  version: "3"
+  services:
+    zwavejs2mqtt:
+      container_name: zwavejs2mqtt
+      image: lansible/zwavejs2mqtt:latest
+      read_only: true
+      volumes:
+        - ./config:/config
+      devices:
+        - /dev/ttyACM0:/dev/ttyACM0
+      restart: always

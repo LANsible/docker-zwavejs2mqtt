@@ -1,0 +1,45 @@
+{
+  "mqtt": {
+    "name": "zwavejs2mqtt",
+    "host": "mosquitto",
+    "port": 1883,
+    "qos": 1,
+    "prefix": "zwave",
+    "reconnectPeriod": 3000,
+    "retain": true,
+    "clean": true,
+    "auth": true,
+    "_ca": "",
+    "ca": "",
+    "_cert": "",
+    "cert": "",
+    "_key": "",
+    "key": "",
+    "username": "user",
+    "password": "password"
+  },
+  "gateway": {
+    "type": 0,
+    "plugins": [],
+    "authEnabled": false,
+    "payloadType": 0,
+    "nodeNames": true,
+    "hassDiscovery": true,
+    "discoveryPrefix": "homeassistant",
+    "logEnabled": true,
+    "logLevel": "info",
+    "logToFile": false,
+    "values": []
+  },
+  "zwave": {
+    "commandsTimeout": 30,
+    "logLevel": "info",
+    "logToFile": false,
+    "serverEnabled": false,
+    "enableStatistics": false,
+    "serverPort": 3000,
+    "disclaimerVersion": 1,
+    "port": "tcp://192.168.1.24:23",
+    "networkKey": "3F5795A98C247ED776BB7290D5144F7A"
+  }
+}
