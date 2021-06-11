@@ -4,7 +4,7 @@ ARG ARCHITECTURE
 #######################################################################################################################
 FROM lansible/nexe:4.0.0-beta.18-${ARCHITECTURE} as builder
 
-ENV VERSION=v5.0.0
+ENV VERSION=v5.0.1
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
@@ -19,6 +19,10 @@ RUN apk --no-cache add \
 RUN git clone --depth 1 --single-branch --branch ${VERSION} https://github.com/zwave-js/zwavejs2mqtt.git /zwavejs2mqtt
 
 WORKDIR /zwavejs2mqtt
+
+# Apply stateless patch
+COPY stateless.patch /zwavejs2mqtt/stateless.patch
+RUN git apply stateless.patch
 
 # Install all modules
 # Run build to make all html files
@@ -38,9 +42,10 @@ RUN nexe --build \
   --resource lib/ \
   --resource ../views/ \
   --resource ../dist/static \
+  --resource ../node_modules/@zwave-js/config/config/devices \
   --output zwavejs2mqtt \
   --input bin/www.js && \
-  mkdir /config
+  mkdir /config /data
 
 
 #######################################################################################################################
@@ -51,8 +56,12 @@ FROM scratch
 # Add description
 LABEL org.label-schema.description="Zwavejs2mqtt as single binary in a scratch container"
 
-# Set env vars for persitance
-ENV STORE_DIR=/config/
+# Set env vars for persistance
+# https://github.com/zwave-js/zwavejs2mqtt/blob/master/docs/guide/env-vars.md
+# SETTINGS_FILE is from the stateless.patch
+ENV STORE_DIR=/data/ \
+  ZWAVEJS_EXTERNAL_CONFIG=/data/ \
+  SETTINGS_FILE=/config/settings.json
 
 # Copy the unprivileged user
 COPY --from=builder /etc_passwd /etc/passwd
@@ -87,6 +96,7 @@ COPY --from=builder \
 # Create default data directory
 # Will fail at runtime due missing the mkdir binary
 COPY --from=builder --chown=zwavejs2mqtt:0 /config /config
+COPY --from=builder --chown=zwavejs2mqtt:0 /data /data
 
 EXPOSE 8091
 USER zwavejs2mqtt

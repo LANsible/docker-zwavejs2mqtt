@@ -43,4 +43,4 @@ spec:
             name: zwavejs2mqtt-config
         - name: zwavejs2mqtt-data
           hostPath:
-            path: /data/zwavejs2mqtt-zwavejs2mqtt-data
+            path: /data/zwavejs2mqtt-data

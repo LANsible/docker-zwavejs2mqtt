@@ -1,0 +1,45 @@
+diff --git a/config/app.ts b/config/app.ts
+index 55735d4..cfe9730 100644
+--- a/config/app.ts
++++ b/config/app.ts
+@@ -6,6 +6,7 @@ config({ path: './.env.app' })
+ // config/app.js
+ export const title: string = 'ZWave To MQTT'
+ export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
++export const settingsFile: string = process.env.SETTINGS_FILE || 'settings'
+ export const defaultUser: string =  'admin'
+ export const defaultPsw: string =  'zwave'
+ export const sessionSecret: string =  process.env.SESSION_SECRET || 'DEFAULT_SESSION_SECRET_CHANGE_ME'
+diff --git a/config/store.ts b/config/store.ts
+index a288733..cb28579 100644
+--- a/config/store.ts
++++ b/config/store.ts
+@@ -1,5 +1,6 @@
+ // config/store.js
+ 
++import { settingsFile } from '../config/app';
+ import { GatewayConfig } from "../lib/Gateway";
+ import { MqttConfig } from "../lib/MqttClient";
+ import { ZwaveConfig } from "../lib/ZwaveClient";
+@@ -24,7 +25,7 @@ export interface Settings {
+ }
+ 
+ const store: Record<StoreKeys, StoreFile> = {
+-  settings : { file: 'settings.json', default: {} },
++  settings : { file: settingsFile , default: {} },
+   scenes : { file: 'scenes.json', default: [] },
+   nodes : { file: 'nodes.json', default: [] },
+   users : { file: 'users.json', default: [] }
+diff --git a/lib/utils.ts b/lib/utils.ts
+index 8b13db6..bc2221a 100644
+--- a/lib/utils.ts
++++ b/lib/utils.ts
+@@ -41,7 +41,7 @@ export function joinPath(write: boolean | string, ...paths: string[]): string {
+ 	if (typeof write === 'boolean') {
+ 		write = getPath(write)
+ 	}
+-	return path.join(write, ...paths)
++	return path.resolve(write, ...paths)
+ }
+ 
+ /**

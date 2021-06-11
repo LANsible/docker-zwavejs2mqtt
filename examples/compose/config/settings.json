@@ -39,7 +39,7 @@
     "enableStatistics": false,
     "serverPort": 3000,
     "disclaimerVersion": 1,
-    "port": "tcp://192.168.1.24:23",
+    "port": "/dev/ttyACM0",
     "networkKey": "3F5795A98C247ED776BB7290D5144F7A"
   }
 }

@@ -6,7 +6,9 @@
 
 ## Why not use the official container?
 
-This is super small since Zwave2js2MQTT is build as a single binary and put into a FROM scratch container.
+Mostly since the upstream container want to write where the settings are stored. I want to keep the settings in a Kubernetes configmap and that makes the folder readonly and not writable.
+I use a little patch to move the settings to their own location :)
+Also this a super small container since Zwave2js2MQTT is build as a single binary and put into a FROM scratch container.
 The container run as user 1000 with primary group 1000 and dailout(20) as secondary group for tty access.
 
 ## Test container with docker-compose
