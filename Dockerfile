@@ -1,10 +1,9 @@
-ARG ARCHITECTURE
 #######################################################################################################################
 # Nexe packaging of binary
 #######################################################################################################################
-FROM lansible/nexe:4.0.0-beta.18-${ARCHITECTURE} as builder
+FROM lansible/nexe:4.0.0-beta.18 as builder
 
-ENV VERSION=v5.0.1
+ENV VERSION=v5.1.0
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
@@ -34,6 +33,7 @@ RUN CORES=$(grep -c '^processor' /proc/cpuinfo); \
 
 WORKDIR /zwavejs2mqtt/server
 
+# See: https://github.com/nexe/nexe/issues/441#issuecomment-359654690
 RUN sed -i "2s/^/require('ejs');\n/" bin/www.js
 
 # Package the binary
