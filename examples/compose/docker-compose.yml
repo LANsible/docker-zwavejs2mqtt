@@ -3,7 +3,7 @@ version: "3"
 services:
   zwavejs2mqtt:
     container_name: zwavejs2mqtt
-    image: zwavejs
+    image: lansible/zwavejs2mqtt:latest
     read_only: true
     volumes:
       - ./config:/config
