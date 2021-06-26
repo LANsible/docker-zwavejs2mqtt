@@ -91,9 +91,11 @@ COPY --from=builder \
 COPY --from=builder \
   /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js \
   /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js
+
+# https://github.com/zwave-js/node-zwave-js/tree/master/packages/config/config
 COPY --from=builder \
-  /zwavejs2mqtt/node_modules/@zwave-js/config/config/devices \
-  /zwavejs2mqtt/node_modules/@zwave-js/config/config/devices
+  /zwavejs2mqtt/node_modules/@zwave-js/config/config/ \
+  /zwavejs2mqtt/node_modules/@zwave-js/config/config/
 
 # Create default data directory
 # Will fail at runtime due missing the mkdir binary
