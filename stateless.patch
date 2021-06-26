@@ -1,45 +1,63 @@
 diff --git a/config/app.ts b/config/app.ts
-index 55735d4..cfe9730 100644
+index 55735d4..a95a3f8 100644
 --- a/config/app.ts
 +++ b/config/app.ts
-@@ -6,6 +6,7 @@ config({ path: './.env.app' })
+@@ -6,6 +6,10 @@ config({ path: './.env.app' })
  // config/app.js
  export const title: string = 'ZWave To MQTT'
  export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
-+export const settingsFile: string = process.env.SETTINGS_FILE || 'settings'
++export const settingsFile: string = process.env.SETTINGS_FILE || 'settings.json'
++export const scenesFile: string = process.env.SCENES_FILE || 'scenes.json'
++export const nodesFile: string = process.env.NODES_FILE || 'nodes.json'
++export const usersFile: string = process.env.USERS_FILE || 'users.json'
  export const defaultUser: string =  'admin'
  export const defaultPsw: string =  'zwave'
  export const sessionSecret: string =  process.env.SESSION_SECRET || 'DEFAULT_SESSION_SECRET_CHANGE_ME'
 diff --git a/config/store.ts b/config/store.ts
-index a288733..cb28579 100644
+index a288733..246d8e1 100644
 --- a/config/store.ts
 +++ b/config/store.ts
 @@ -1,5 +1,6 @@
  // config/store.js
  
-+import { settingsFile } from '../config/app';
++import { settingsFile, scenesFile, nodesFile, usersFile } from '../config/app';
  import { GatewayConfig } from "../lib/Gateway";
  import { MqttConfig } from "../lib/MqttClient";
  import { ZwaveConfig } from "../lib/ZwaveClient";
-@@ -24,7 +25,7 @@ export interface Settings {
+@@ -24,10 +25,10 @@ export interface Settings {
  }
  
  const store: Record<StoreKeys, StoreFile> = {
 -  settings : { file: 'settings.json', default: {} },
+-  scenes : { file: 'scenes.json', default: [] },
+-  nodes : { file: 'nodes.json', default: [] },
+-  users : { file: 'users.json', default: [] }
 +  settings : { file: settingsFile , default: {} },
-   scenes : { file: 'scenes.json', default: [] },
-   nodes : { file: 'nodes.json', default: [] },
-   users : { file: 'users.json', default: [] }
-diff --git a/lib/utils.ts b/lib/utils.ts
-index 8b13db6..bc2221a 100644
---- a/lib/utils.ts
-+++ b/lib/utils.ts
-@@ -41,7 +41,7 @@ export function joinPath(write: boolean | string, ...paths: string[]): string {
- 	if (typeof write === 'boolean') {
- 		write = getPath(write)
- 	}
--	return path.join(write, ...paths)
-+	return path.resolve(write, ...paths)
++  scenes : { file: scenesFile, default: [] },
++  nodes : { file: nodesFile, default: [] },
++  users : { file: usersFile, default: [] }
  }
  
- /**
+ export default store
+diff --git a/lib/jsonStore.ts b/lib/jsonStore.ts
+index 5c182ca..a406609 100644
+--- a/lib/jsonStore.ts
++++ b/lib/jsonStore.ts
+@@ -39,7 +39,7 @@ export class StorageHelper {
+ 		let err: { code: string }
+ 		let data: any
+ 		try {
+-			data = await readFile(utils.joinPath(storeDir, config.file))
++			data = await readFile(config.file)
+ 		} catch (error) {
+ 			err = error
+ 		}
+@@ -69,7 +69,7 @@ export class StorageHelper {
+ 	}
+ 
+ 	async put(model: StoreFile, data: any) {
+-		await writeFile(utils.joinPath(storeDir, model.file), data)
++		await writeFile(model.file, data)
+ 		this._store[model.file] = data
+ 		return data
+ 	}
