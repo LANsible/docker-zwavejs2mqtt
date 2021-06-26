@@ -42,7 +42,6 @@ RUN nexe --build \
   --resource lib/ \
   --resource ../views/ \
   --resource ../dist/static \
-  --resource ../node_modules/@zwave-js/config/config/devices \
   --output zwavejs2mqtt \
   --input bin/www.js && \
   mkdir /config /data
@@ -88,10 +87,13 @@ COPY --from=builder \
   /zwavejs2mqtt/node_modules/@serialport/bindings/build/Release/bindings.node \
   /zwavejs2mqtt/build/bindings.node
 
-# Add file needed, doesn't work as --resource
+# Add files needed, doesn't work as --resource
 COPY --from=builder \
   /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js \
   /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js
+COPY --from=builder \
+  /zwavejs2mqtt/node_modules/@zwave-js/config/config/devices \
+  /zwavejs2mqtt/node_modules/@zwave-js/config/config/devices
 
 # Create default data directory
 # Will fail at runtime due missing the mkdir binary
