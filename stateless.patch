@@ -1,15 +1,15 @@
 diff --git a/config/app.ts b/config/app.ts
-index 55735d4..a95a3f8 100644
+index 55735d4..db89ec4 100644
 --- a/config/app.ts
 +++ b/config/app.ts
 @@ -6,6 +6,10 @@ config({ path: './.env.app' })
  // config/app.js
  export const title: string = 'ZWave To MQTT'
  export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
-+export const settingsFile: string = process.env.SETTINGS_FILE || 'settings.json'
-+export const scenesFile: string = process.env.SCENES_FILE || 'scenes.json'
-+export const nodesFile: string = process.env.NODES_FILE || 'nodes.json'
-+export const usersFile: string = process.env.USERS_FILE || 'users.json'
++export const settingsFile: string = process.env.SETTINGS_FILE || joinPath(storeDir, 'settings.json')
++export const scenesFile: string = process.env.SCENES_FILE || joinPath(storeDir, 'scenes.json')
++export const nodesFile: string = process.env.NODES_FILE || joinPath(storeDir, 'nodes.json')
++export const usersFile: string = process.env.USERS_FILE || joinPath(storeDir, 'users.json')
  export const defaultUser: string =  'admin'
  export const defaultPsw: string =  'zwave'
  export const sessionSecret: string =  process.env.SESSION_SECRET || 'DEFAULT_SESSION_SECRET_CHANGE_ME'
