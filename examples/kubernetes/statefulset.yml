@@ -14,6 +14,7 @@ metadata:
     app: zwavejs2mqtt
 spec:
   replicas: 1
+  serviceName: zwavejs2mqtt
   selector:
     matchLabels:
       app: zwavejs2mqtt
@@ -30,8 +31,15 @@ spec:
           image: lansible/zwavejs2mqtt:master
           imagePullPolicy: Always
           securityContext:
-            # Make container filesystem readonly
+            capabilities:
+                drop:
+                  - ALL
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          ports:
+            - name: dash
+              containerPort: 8091
           volumeMounts:
             - name: zwavejs2mqtt-config
               mountPath: /config
