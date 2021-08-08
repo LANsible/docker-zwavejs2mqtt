@@ -3,7 +3,7 @@
 #######################################################################################################################
 FROM lansible/nexe:4.0.0-beta.18 as builder
 
-ENV VERSION=v5.4.3
+ENV VERSION=v5.4.5
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
