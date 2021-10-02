@@ -1,9 +1,9 @@
 #######################################################################################################################
 # Nexe packaging of binary
 #######################################################################################################################
-FROM lansible/nexe:4.0.0-beta.18 as builder
+FROM lansible/nexe:4.0.0-beta.19 as builder
 
-ENV VERSION=v5.4.5
+ENV VERSION=v5.7.2
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
@@ -41,7 +41,7 @@ RUN nexe --build \
   --resource hass/ \
   --resource lib/ \
   --resource ../views/ \
-  --resource ../dist/static \
+  --resource ../dist/ \
   --output zwavejs2mqtt \
   --input bin/www.js && \
   mkdir /config /data
@@ -59,7 +59,7 @@ LABEL org.label-schema.description="Zwavejs2mqtt as single binary in a scratch c
 # https://github.com/zwave-js/zwavejs2mqtt/blob/master/docs/guide/env-vars.md
 # SETTINGS_FILE is from the stateless.patch
 ENV STORE_DIR=/data/ \
-  ZWAVEJS_EXTERNAL_CONFIG=/data/ \
+  ZWAVEJS_EXTERNAL_CONFIG=/data/zwavejs \
   SETTINGS_FILE=/config/settings.json
 
 # Copy the unprivileged user
