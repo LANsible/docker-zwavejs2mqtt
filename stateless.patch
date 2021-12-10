@@ -40,11 +40,11 @@ index a288733..246d8e1 100644
  
  export default store
 diff --git a/lib/jsonStore.ts b/lib/jsonStore.ts
-index 5c182ca..a406609 100644
+index f1e84cd..bc32b63 100644
 --- a/lib/jsonStore.ts
 +++ b/lib/jsonStore.ts
 @@ -39,7 +39,7 @@ export class StorageHelper {
- 		let err: { code: string }
+ 		let err: { code: string } | undefined
  		let data: any
  		try {
 -			data = await readFile(utils.joinPath(storeDir, config.file))

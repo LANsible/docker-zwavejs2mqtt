@@ -3,7 +3,7 @@
 #######################################################################################################################
 FROM lansible/nexe:4.0.0-beta.19 as builder
 
-ENV VERSION=v5.7.3
+ENV VERSION=v6.1.0
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
@@ -27,7 +27,7 @@ RUN git apply stateless.patch
 # Run build to make all html files
 RUN CORES=$(grep -c '^processor' /proc/cpuinfo); \
   export MAKEFLAGS="-j$((CORES+1)) -l${CORES}"; \
-  npm install && \
+  npm install --legacy-peer-deps && \
   npm run build && \
   npm prune --production
 
@@ -96,6 +96,11 @@ COPY --from=builder \
 COPY --from=builder \
   /zwavejs2mqtt/node_modules/@zwave-js/config/config/ \
   /zwavejs2mqtt/node_modules/@zwave-js/config/config/
+
+# After troubleshooting this somehow can't be packed
+COPY --from=builder \
+  /zwavejs2mqtt/node_modules/engine.io-parser/ \
+  /zwavejs2mqtt/node_modules/engine.io-parser/
 
 # Create default data directory
 # Will fail at runtime due missing the mkdir binary
