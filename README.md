@@ -1,8 +1,8 @@
 # Zwavejs2MQTT from scratch!
-[![pipeline status](https://gitlab.com/lansible1/docker-zwavejs2mqtt/badges/master/pipeline.svg)](https://gitlab.com/lansible1/docker-zwavejs2mqtt/-/commits/master)
+[![Build Status](https://gitlab.com/lansible1/docker-zwavejs2mqtt/badges/master/pipeline.svg)](https://gitlab.com/lansible1/docker-zwavejs2mqtt/pipelines)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lansible/zwavejs2mqtt.svg)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
-[![Docker Version](https://images.microbadger.com/badges/version/lansible/zwavejs2mqtt:latest.svg)](https://microbadger.com/images/lansible/zwavejs2mqtt:latest)
-[![Docker Size/Layers](https://images.microbadger.com/badges/image/lansible/zwavejs2mqtt:latest.svg)](https://microbadger.com/images/lansible/zwavejs2mqtt:latest)
+[![Docker Version](https://img.shields.io/docker/v/lansible/zwavejs2mqtt?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
+[![Docker Image Size](https://img.shields.io/docker/image-size/lansible/zwavejs2mqtt?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
 
 ## Why not use the official container?
 
@@ -23,15 +23,8 @@ docker-compose up
 You could build the container locally like this:
 
 ```bash
-docker build . \
-      --build-arg ARCHITECTURE=amd64 \
-      --tag lansible/zwavejs2mqtt:dev-amd64
+docker build . --tag lansible/zwavejs2mqtt:dev-amd64
 ```
-The arguments are:
-
-| Build argument | Description                                    | Example                 |
-|----------------|------------------------------------------------|-------------------------|
-| `ARCHITECTURE` | For what architecture to build the container   | `arm64`                 |
 
 Available architectures are what `lansible/nexe` supports:
 https://hub.docker.com/r/lansible/nexe/tags
