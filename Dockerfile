@@ -3,7 +3,9 @@
 #######################################################################################################################
 FROM lansible/nexe:4.0.0-beta.19 as builder
 
-ENV VERSION=v6.6.2
+# https://github.com/docker/buildx#building-multi-platform-images
+ARG TARGETPLATFORM
+ENV VERSION=v6.7.1
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
@@ -27,9 +29,18 @@ RUN git apply stateless.patch
 # Run build to make all html files
 RUN CORES=$(grep -c '^processor' /proc/cpuinfo); \
   export MAKEFLAGS="-j$((CORES+1)) -l${CORES}"; \
-  npm install --legacy-peer-deps && \
+  npm install && \
   npm run build && \
   npm prune --production
+
+# Remove all unneeded prebuilds
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    export TARGETPLATFORM="linux/x64"; \
+  fi && \
+  export PLATFORM=${TARGETPLATFORM/\//-}; \
+  echo ${PLATFORM} > platform; \
+  find . -name *.node -path *prebuilds/* -not -path *${PLATFORM}* -name *.node -delete && \
+  find . -name *.glibc.node -path *prebuilds/* -delete
 
 WORKDIR /zwavejs2mqtt/server
 
@@ -58,9 +69,12 @@ LABEL org.label-schema.description="Zwavejs2mqtt as single binary in a scratch c
 # Set env vars for persistance
 # https://github.com/zwave-js/zwavejs2mqtt/blob/master/docs/guide/env-vars.md
 # SETTINGS_FILE is from the stateless.patch
+# LIBC is set for prebuilify (node-gyp-build) to pickup the bindings file from serialport:
+# https://github.com/prebuild/node-gyp-build/blob/2e982977240368f8baed3975a0f3b048999af40e/index.js#L15
 ENV STORE_DIR=/data/ \
   ZWAVEJS_EXTERNAL_CONFIG=/data/zwavejs \
-  SETTINGS_FILE=/config/settings.json
+  SETTINGS_FILE=/config/settings.json \
+  LIBC=musl
 
 # Copy the unprivileged user
 COPY --from=builder /etc_passwd /etc/passwd
@@ -84,18 +98,8 @@ COPY --from=builder /zwavejs2mqtt/server/zwavejs2mqtt /zwavejs2mqtt/bin/zwavejs2
 
 # Add bindings.node for serialport
 COPY --from=builder \
-  /zwavejs2mqtt/node_modules/@serialport/bindings/build/Release/bindings.node \
-  /zwavejs2mqtt/build/bindings.node
-
-# Add files needed, doesn't work as --resource
-COPY --from=builder \
-  /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js \
-  /zwavejs2mqtt/node_modules/@serialport/bindings/lib/linux.js
-
-# https://github.com/zwave-js/node-zwave-js/tree/master/packages/config/config
-COPY --from=builder \
-  /zwavejs2mqtt/node_modules/@zwave-js/config/config/ \
-  /zwavejs2mqtt/node_modules/@zwave-js/config/config/
+  /zwavejs2mqtt/node_modules/@serialport/bindings-cpp/prebuilds/ \
+  /zwavejs2mqtt/node_modules/@serialport/bindings-cpp/prebuilds/
 
 # After troubleshooting this somehow can't be packed
 COPY --from=builder \
