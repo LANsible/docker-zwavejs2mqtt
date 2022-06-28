@@ -5,7 +5,7 @@ FROM lansible/nexe:4.0.0-rc1 as builder
 
 # https://github.com/docker/buildx#building-multi-platform-images
 ARG TARGETPLATFORM
-ENV VERSION=v6.12.1
+ENV VERSION=v6.13.0
 
 # Add unprivileged user
 RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
