@@ -1,18 +1,24 @@
 diff --git a/config/app.ts b/config/app.ts
-index 55735d4..db89ec4 100644
+index ffa2c22..7da939c 100644
 --- a/config/app.ts
 +++ b/config/app.ts
-@@ -6,6 +6,10 @@ config({ path: './.env.app' })
- // config/app.js
- export const title: string = 'ZWave To MQTT'
- export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
+@@ -9,11 +9,15 @@ export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
+ export const logsDir: string = joinPath(storeDir, 'logs')
+ export const snippetsDir: string = joinPath(storeDir, 'snippets')
+ 
+-export const tmpDir: string = joinPath(storeDir, '.tmp')
++export const tmpDir: string = process.env.TMPDIR || joinPath(storeDir, '.tmp')
+ export const backupsDir: string = process.env.BACKUPS_DIR || joinPath(storeDir, 'backups')
+ export const nvmBackupsDir: string = joinPath(backupsDir, 'nvm')
+ export const storeBackupsDir: string = joinPath(backupsDir, 'store')
+ 
 +export const settingsFile: string = process.env.SETTINGS_FILE || joinPath(storeDir, 'settings.json')
 +export const scenesFile: string = process.env.SCENES_FILE || joinPath(storeDir, 'scenes.json')
 +export const nodesFile: string = process.env.NODES_FILE || joinPath(storeDir, 'nodes.json')
 +export const usersFile: string = process.env.USERS_FILE || joinPath(storeDir, 'users.json')
+ 
  export const defaultUser: string =  'admin'
  export const defaultPsw: string =  'zwave'
- export const sessionSecret: string =  process.env.SESSION_SECRET || 'DEFAULT_SESSION_SECRET_CHANGE_ME'
 diff --git a/config/store.ts b/config/store.ts
 index eb6ae24..b90cee4 100644
 --- a/config/store.ts
@@ -47,10 +53,10 @@ index eb6ae24..b90cee4 100644
  
  export default store
 diff --git a/lib/jsonStore.ts b/lib/jsonStore.ts
-index 865ee9e..2e91521 100644
+index 7e16d00..ce45cdc 100644
 --- a/lib/jsonStore.ts
 +++ b/lib/jsonStore.ts
-@@ -40,7 +40,7 @@ export class StorageHelper {
+@@ -94,7 +94,7 @@ export class StorageHelper {
  		let err: { code: string } | undefined
  		let data: any
  		try {
@@ -59,7 +65,7 @@ index 865ee9e..2e91521 100644
  		} catch (error) {
  			err = error
  		}
-@@ -73,7 +73,7 @@ export class StorageHelper {
+@@ -127,7 +127,7 @@ export class StorageHelper {
  	}
  
  	async put(model: StoreFile, data: any) {

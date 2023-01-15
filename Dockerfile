@@ -1,37 +1,39 @@
 #######################################################################################################################
 # Nexe packaging of binary
 #######################################################################################################################
-FROM lansible/nexe:4.0.0-rc1 as builder
+FROM lansible/nexe:4.0.0-rc.2 as builder
 
 # https://github.com/docker/buildx#building-multi-platform-images
 ARG TARGETPLATFORM
-ENV VERSION=v6.13.0
+# https://github.com/zwave-js/zwave-js-ui/releases
+ENV VERSION=v8.6.3
 
 # Add unprivileged user
-RUN echo "zwavejs2mqtt:x:1000:1000:zwavejs2mqtt:/:" > /etc_passwd
+RUN echo "zwave-js-ui:x:1000:1000:zwave-js-ui:/:" > /etc_passwd
 # Add to dailout as secondary group (20)
-RUN echo "dailout:x:20:zwavejs2mqtt" > /etc_group
+RUN echo "dailout:x:20:zwave-js-ui" > /etc_group
 
 # eudev: needed for udevadm binary
 RUN apk --no-cache add \
   eudev
 
-# Setup zwavejs2mqtt
-RUN git clone --depth 1 --single-branch --branch ${VERSION} https://github.com/zwave-js/zwavejs2mqtt.git /zwavejs2mqtt
+# Setup zwave-js-ui
+RUN git clone --depth 1 --single-branch --branch ${VERSION} https://github.com/zwave-js/zwave-js-ui.git /zwave-js-ui
 
-WORKDIR /zwavejs2mqtt
+WORKDIR /zwave-js-ui
 
 # Apply stateless patch
-COPY stateless.patch /zwavejs2mqtt/stateless.patch
+COPY stateless.patch /zwave-js-ui/stateless.patch
 RUN git apply stateless.patch
 
 # Install all modules
 # Run build to make all html files
+# https://github.com/zwave-js/zwave-js-ui/blob/master/docker/Dockerfile#L20
 RUN CORES=$(grep -c '^processor' /proc/cpuinfo); \
   export MAKEFLAGS="-j$((CORES+1)) -l${CORES}"; \
-  npm install && \
-  npm run build && \
-  npm prune --production
+  yarn install --immutable && \
+  yarn build && \
+  yarn remove $(cat package.json | jq -r '.devDependencies | keys | join(" ")')
 
 # Remove all unneeded prebuilds
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
@@ -41,7 +43,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
   find . -name *.node -path *prebuilds/* -not -path *${PLATFORM}* -name *.node -delete && \
   find . -name *.glibc.node -path *prebuilds/* -delete
 
-WORKDIR /zwavejs2mqtt/server
+WORKDIR /zwave-js-ui/server
 
 # See: https://github.com/nexe/nexe/issues/441#issuecomment-359654690
 RUN sed -i "2s/^/require('ejs');\n/" bin/www.js
@@ -52,10 +54,10 @@ RUN nexe --build \
   --resource lib/ \
   --resource ../views/ \
   --resource ../dist/ \
-  --output zwavejs2mqtt \
+  --resource ../node_modules/@esm2cjs \
+  --output zwave-js-ui \
   --input bin/www.js && \
   mkdir /config /data
-
 
 #######################################################################################################################
 # Final scratch image
@@ -63,17 +65,18 @@ RUN nexe --build \
 FROM scratch
 
 # Add description
-LABEL org.label-schema.description="Zwavejs2mqtt as single binary in a scratch container"
+LABEL org.label-schema.description="Zwave-js-ui as single binary in a scratch container"
 
 # Set env vars for persistance
-# https://github.com/zwave-js/zwavejs2mqtt/blob/master/docs/guide/env-vars.md
+# https://github.com/zwave-js/zwave-js-ui/blob/master/docs/guide/env-vars.md
 # SETTINGS_FILE is from the stateless.patch
 # LIBC is set for prebuilify (node-gyp-build) to pickup the bindings file from serialport:
 # https://github.com/prebuild/node-gyp-build/blob/2e982977240368f8baed3975a0f3b048999af40e/index.js#L15
-ENV STORE_DIR=/data/ \
-  ZWAVEJS_EXTERNAL_CONFIG=/data/zwavejs \
+ENV TMPDIR=/dev/shm \
+  STORE_DIR=/data/ \
   SETTINGS_FILE=/config/settings.json \
-  LIBC=musl
+  LIBC=musl \
+  NO_LOG_COLORS=true
 
 # Copy the unprivileged user
 COPY --from=builder /etc_passwd /etc/passwd
@@ -92,26 +95,35 @@ COPY --from=builder \
   /usr/lib/libgcc_s.so.1 \
   /usr/lib/
 
-# Copy zwavejs2mqtt binary
-COPY --from=builder /zwavejs2mqtt/server/zwavejs2mqtt /zwavejs2mqtt/bin/zwavejs2mqtt
+# Copy zwave-js-ui binary
+COPY --from=builder /zwave-js-ui/server/zwave-js-ui /zwave-js-ui/bin/zwave-js-ui
 
 # Add bindings.node for serialport
 COPY --from=builder \
-  /zwavejs2mqtt/node_modules/@serialport/bindings-cpp/prebuilds/ \
-  /zwavejs2mqtt/node_modules/@serialport/bindings-cpp/prebuilds/
+  /zwave-js-ui/node_modules/@serialport/bindings-cpp/prebuilds/ \
+  /zwave-js-ui/node_modules/@serialport/bindings-cpp/prebuilds/
 
 # After troubleshooting this somehow can't be packed
 COPY --from=builder \
-  /zwavejs2mqtt/node_modules/engine.io-parser/ \
-  /zwavejs2mqtt/node_modules/engine.io-parser/
+  /zwave-js-ui/node_modules/socket.io-parser/ \
+  /zwave-js-ui/node_modules/socket.io-parser/
+COPY --from=builder \
+  /zwave-js-ui/node_modules/engine.io-parser/ \
+  /zwave-js-ui/node_modules/engine.io-parser/
+COPY --from=builder \
+  /zwave-js-ui/snippets/ \
+  /zwave-js-ui/snippets/
+COPY --from=builder \
+  /zwave-js-ui/node_modules/@zwave-js/config/config/devices \
+  /zwave-js-ui/node_modules/@zwave-js/config/config/devices
 
 # Create default data directory
 # Will fail at runtime due missing the mkdir binary
-COPY --from=builder --chown=zwavejs2mqtt:0 /config /config
-COPY --from=builder --chown=zwavejs2mqtt:0 /data /data
+COPY --from=builder --chown=zwave-js-ui:0 /config /config
+COPY --from=builder --chown=zwave-js-ui:0 /data /data
 
 EXPOSE 8091
-USER zwavejs2mqtt
-WORKDIR /zwavejs2mqtt
+USER zwave-js-ui
+WORKDIR /zwave-js-ui
 # Relative includes so needs to be one folder down from root
-ENTRYPOINT ["./bin/zwavejs2mqtt"]
+ENTRYPOINT ["./bin/zwave-js-ui"]
