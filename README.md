@@ -1,8 +1,8 @@
 # Zwavejs2MQTT from scratch!
-[![Build Status](https://gitlab.com/lansible1/docker-zwavejs2mqtt/badges/master/pipeline.svg)](https://gitlab.com/lansible1/docker-zwavejs2mqtt/pipelines)
+[![Build Status](https://github.com/LANsible/docker-zwavejs2mqtt/actions/workflows/docker.yml/badge.svg)](https://github.com/LANsible/docker-zwavejs2mqtt/actions/workflows/docker.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lansible/zwavejs2mqtt.svg)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
-[![Docker Version](https://img.shields.io/docker/v/lansible/zwavejs2mqtt?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
-[![Docker Image Size](https://img.shields.io/docker/image-size/lansible/zwavejs2mqtt?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
+[![Docker Version](https://img.shields.io/docker/v/lansible/zwavejs2mqtt.svg?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
+[![Docker Size/Layers](https://img.shields.io/docker/image-size/lansible/zwavejs2mqtt.svg?sort=semver)](https://hub.docker.com/r/lansible/zwavejs2mqtt)
 
 ## Why not use the official container?
 
