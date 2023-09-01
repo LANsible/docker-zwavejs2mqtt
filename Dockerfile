@@ -6,7 +6,7 @@ FROM lansible/nexe:4.0.0-rc.2 as builder
 # https://github.com/docker/buildx#building-multi-platform-images
 ARG TARGETPLATFORM
 # https://github.com/zwave-js/zwave-js-ui/releases
-ENV VERSION=v8.23.2
+ENV VERSION=v8.24.0
 
 # Add unprivileged user
 RUN echo "zwave-js-ui:x:1000:1000:zwave-js-ui:/:" > /etc_passwd
