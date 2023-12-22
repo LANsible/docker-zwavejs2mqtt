@@ -6,7 +6,7 @@ FROM lansible/nexe:4.0.0-rc.2 as builder
 # https://github.com/docker/buildx#building-multi-platform-images
 ARG TARGETPLATFORM
 # https://github.com/zwave-js/zwave-js-ui/releases
-ENV VERSION=v9.3.1
+ENV VERSION=v9.6.2
 
 # Add unprivileged user
 RUN echo "zwave-js-ui:x:1000:1000:zwave-js-ui:/:" > /etc_passwd
@@ -14,8 +14,10 @@ RUN echo "zwave-js-ui:x:1000:1000:zwave-js-ui:/:" > /etc_passwd
 RUN echo "dailout:x:20:zwave-js-ui" > /etc_group
 
 # eudev: needed for udevadm binary
+# jq: used in yarn command of zwavejs
 RUN apk --no-cache add \
-  eudev
+  eudev \
+  jq
 
 # Setup zwave-js-ui
 RUN git clone --depth 1 --single-branch --branch ${VERSION} https://github.com/zwave-js/zwave-js-ui.git /zwave-js-ui
@@ -44,9 +46,6 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
   find . -name *.glibc.node -path *prebuilds/* -delete
 
 WORKDIR /zwave-js-ui/server
-
-# See: https://github.com/nexe/nexe/issues/441#issuecomment-359654690
-RUN sed -i "2s/^/require('ejs');\n/" bin/www.js
 
 # Package the binary
 RUN nexe --build \

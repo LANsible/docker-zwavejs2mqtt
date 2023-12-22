@@ -1,14 +1,8 @@
-diff --git a/config/app.ts b/config/app.ts
-index ffa2c22..7da939c 100644
---- a/config/app.ts
-+++ b/config/app.ts
-@@ -9,11 +9,15 @@ export const storeDir: string = process.env.STORE_DIR || joinPath(true, 'store')
- export const logsDir: string = joinPath(storeDir, 'logs')
- export const snippetsDir: string = joinPath(storeDir, 'snippets')
- 
--export const tmpDir: string = joinPath(storeDir, '.tmp')
-+export const tmpDir: string = process.env.TMPDIR || joinPath(storeDir, '.tmp')
- export const backupsDir: string = process.env.BACKUPS_DIR || joinPath(storeDir, 'backups')
+diff --git a/api/config/app.ts b/api/config/app.ts
+index 30727220..a40c8882 100644
+--- a/api/config/app.ts
++++ b/api/config/app.ts
+@@ -16,6 +16,11 @@ export const backupsDir: string =
  export const nvmBackupsDir: string = joinPath(backupsDir, 'nvm')
  export const storeBackupsDir: string = joinPath(backupsDir, 'store')
  
@@ -16,13 +10,14 @@ index ffa2c22..7da939c 100644
 +export const scenesFile: string = process.env.SCENES_FILE || joinPath(storeDir, 'scenes.json')
 +export const nodesFile: string = process.env.NODES_FILE || joinPath(storeDir, 'nodes.json')
 +export const usersFile: string = process.env.USERS_FILE || joinPath(storeDir, 'users.json')
- 
- export const defaultUser: string =  'admin'
- export const defaultPsw: string =  'zwave'
-diff --git a/config/store.ts b/config/store.ts
-index eb6ae24..b90cee4 100644
---- a/config/store.ts
-+++ b/config/store.ts
++
+ export const defaultUser: string = 'admin'
+ export const defaultPsw: string = 'zwave'
+ // lgtm [js/hardcoded-credentials]
+diff --git a/api/config/store.ts b/api/config/store.ts
+index eb6ae249..b90cee4d 100644
+--- a/api/config/store.ts
++++ b/api/config/store.ts
 @@ -1,5 +1,6 @@
  // config/store.js
  
@@ -52,10 +47,10 @@ index eb6ae24..b90cee4 100644
  }
  
  export default store
-diff --git a/lib/jsonStore.ts b/lib/jsonStore.ts
-index 7e16d00..ce45cdc 100644
---- a/lib/jsonStore.ts
-+++ b/lib/jsonStore.ts
+diff --git a/api/lib/jsonStore.ts b/api/lib/jsonStore.ts
+index 92100a55..266ffefd 100644
+--- a/api/lib/jsonStore.ts
++++ b/api/lib/jsonStore.ts
 @@ -94,7 +94,7 @@ export class StorageHelper {
  		let err: { code: string } | undefined
  		let data: any
