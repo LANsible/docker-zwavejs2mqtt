@@ -28,12 +28,12 @@ WORKDIR /zwave-js-ui
 COPY stateless.patch /zwave-js-ui/stateless.patch
 RUN git apply stateless.patch
 
-# Install all modules
+# Install all modules (increase timeout to avoid 'There appears to be trouble with your network connection.')
 # Run build to make all html files
 # https://github.com/zwave-js/zwave-js-ui/blob/master/docker/Dockerfile#L20
 RUN CORES=$(grep -c '^processor' /proc/cpuinfo); \
   export MAKEFLAGS="-j$((CORES+1)) -l${CORES}"; \
-  yarn install --immutable && \
+  yarn install --immutable --network-timeout 100000 && \
   yarn build && \
   yarn remove $(cat package.json | jq -r '.devDependencies | keys | join(" ")')
 
